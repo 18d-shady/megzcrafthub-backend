@@ -86,12 +86,12 @@ WSGI_APPLICATION = "megzcrafthub.wsgi.application"
 
 DATABASES = {
     "default": {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'DavisOlehi$default',
-        'USER': 'DavisOlehi',
-        'PASSWORD': 'winston1921',
-        'HOST': 'DavisOlehi.mysql.pythonanywhere-services.com',
-        'PORT': '3306',
+        'ENGINE': '',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
     }
 }
 
@@ -132,14 +132,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # e.g., smtp.gmail.com
 EMAIL_PORT = 587  # For TLS
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'megzcrafthubsourcemail@gmail.com'
-EMAIL_HOST_PASSWORD = 'sllj fxqp wjzv wvny'
-DEFAULT_FROM_EMAIL = 'megzcrafthubsourcemail@gmail.com'
-"""
-EMAIL_HOST_USER = 'olehidavis@gmail.com'
-EMAIL_HOST_PASSWORD = 'dzlh ltst tbup lvoc'
-DEFAULT_FROM_EMAIL = 'olehidavis@gmail.com'
-"""
+EMAIL_HOST_USER = 'm******@gmail.com'
+EMAIL_HOST_PASSWORD = '*******'
+DEFAULT_FROM_EMAIL = 'm********@gmail.com'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -155,22 +151,3 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR)
 #MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-"""
-DATABASES = {
-    "default": {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'DavisOlehi$default',
-        'USER': 'DavisOlehi',
-        'PASSWORD': 'winston1921',
-        'HOST': 'DavisOlehi.mysql.pythonanywhere-services.com',
-        'PORT': '3306',
-    }
-}
-
-
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # or 'django.contrib.sessions.backends.cached_db'
-SESSION_COOKIE_AGE = 604800  # 1 week
-SESSION_SAVE_EVERY_REQUEST = True
-SESSION_COOKIE_DOMAIN = 'localhost:3000'
-SESSION_COOKIE_SECURE = False
-"""
