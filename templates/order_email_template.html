@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Order Received</title>
+</head>
+<body>
+    <h1>New Order Received</h1>
+    <h2>Customer Information</h2>
+    <p>Name: {{ customer_info.fname }} {{ customer_info.lname }} </p>
+    <p>Email: {{ customer_info.email }}</p>
+    <p>Phone Number: {{ customer_info.phone_number }}</p>
+    <p>Address: {{ customer_info.address }}</p>
+
+    <h2>Order Details</h2>
+    <ul>
+        {% for item in order_details %}
+            <li>
+                <p><strong>{{ item.gift_box_name }}</strong></p>
+                <img src="https://davisolehi.pythonanywhere.com{{ item.gift_box_image }}" alt="{{ item.gift_box_name }}" style="width:200px;"><br>
+                {% if item.item_description_image %}
+                    <br>something like this<br>
+                    <img src="https://davisolehi.pythonanywhere.com{{ item.item_description_image }}" alt="Description Image" style="width:200px;"><br>
+                {% endif %}
+                <p>Quantity: {{ item.quantity }}</p>
+                <p>Price: N{{ item.price }}</p>
+                <p>{{ item.description }}</p>
+                <br>
+            </li>
+        {% endfor %}
+    </ul>
+    <p>Total Price: N{{ total_price }}</p>
+    <p>Receive Method: {{ receive_option }}</p>
+</body>
+</html>

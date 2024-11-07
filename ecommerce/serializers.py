@@ -36,11 +36,11 @@ class CustomerAccountSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     customer = CustomerSerializer()
-    gift_box = GiftBoxSerializer()
+    #gift_box = GiftBoxSerializer()
 
     class Meta:
         model = Order
-        fields = ['id', 'customer', 'status', 'order_date', 'total_price']
+        fields = ['id', 'customer', 'status', 'order_date', 'total_price', 'cart_status', 'session_id']
 
 class OrderItemSerializer(serializers.ModelSerializer):
     order = OrderSerializer()
@@ -48,7 +48,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'order', 'gift_box', 'quantity', 'price']
+        fields = ['id', 'order', 'gift_box', 'quantity', 'price', 'description', 'image']
 
 class PaymentSerializer(serializers.ModelSerializer):
     order = OrderSerializer()

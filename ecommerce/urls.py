@@ -8,7 +8,14 @@ urlpatterns = [
     path('api/categories/', CategoryListView.as_view(), name='category-list'),
     path('api/giftbox/', GiftBoxListView.as_view(), name='giftbox-list'),
     path('api/giftbox/product/', GiftBoxDetailView.as_view(), name='giftbox-detail'),
+    path('api/add-to-cart/', views.AddToCartView.as_view(), name='add_to_cart'),
+    path('api/view-cart/', views.CartItemsAPI.as_view(), name='view_cart'),
+    path('api/order/', views.CheckoutAPI.as_view(), name='order'),
+    path('api/final-order/', views.OrderView.as_view(), name='real_order'),
+    path('api/complete-checkout/', views.PaymentSuccess.as_view(), name='finish_order'),
+    #path('api/view-cart/<int:pk>/', views.CartItemsAPI.as_view(), name='view_cart'),
 ]
+
 
 """
 path('products/', views.product_catalog, name='product_catalog'),

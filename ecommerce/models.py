@@ -41,33 +41,50 @@ class CustomerAccount(models.Model):
     """
 
 class Customer(models.Model):
-	first_name = models.CharField(max_length=255)
-	last_name = models.CharField(max_length=255)
-	email = models.EmailField(unique=True)
-	phone_number = models.CharField(max_length=20)
-	address = models.TextField()
-	created_at = models.DateTimeField(auto_now_add=True)
-	updated_at = models.DateTimeField(auto_now=True)
-	has_account = models.BooleanField(default=False)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    email = models.EmailField(unique=True)
+    phone_number = models.CharField(max_length=20)
+    address = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    has_account = models.BooleanField(default=False)
+    session_id = models.CharField(max_length=255, null=True, blank=True)
+    
 
 class Order(models.Model):
 	#user = models.ForeignKey(CustomerAccount, on_delete=models.CASCADE, null=True, blank=True)
-	customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-	order_date = models.DateTimeField(auto_now_add=True)
-	total_price = models.DecimalField(max_digits=10, decimal_places=2)
-	status = models.CharField(max_length=20, choices=[
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True)
+    order_date = models.DateTimeField(auto_now_add=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    cart_status = models.CharField(max_length=20, choices=[
+        ('cart', 'Cart'),
+        ('real', 'Real'),
+    ], default='cart')
+    status = models.CharField(max_length=20, choices=[
         ('pending', 'Pending'),
         ('shipped', 'Shipped'),
         ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled')
-    ])
+    ], default='pending')
+    session_id = models.CharField(max_length=255, null=True, blank=True)
+
+    
+    def save(self, *args, **kwargs):
+        # Only calculate total_price if the instance already has a primary key
+        if self.pk is not None:
+            self.total_price = sum(item.price * item.quantity for item in self.orderitem_set.all())
+        super().save(*args, **kwargs)
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     gift_box = models.ForeignKey(GiftBox, on_delete=models.CASCADE)
     quantity = models.IntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)        
-
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField(blank=True)  # Text description
+    image = models.ImageField(upload_to='order_item_images/', blank=True)        
+    
 class Payment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     payment_method = models.CharField(max_length=20, choices=[
