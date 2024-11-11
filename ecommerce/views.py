@@ -31,12 +31,12 @@ class GiftBoxListView(APIView):
             giftboxes = GiftBox.objects.filter(category=category)
             categorized_giftboxes[category.name] = GiftBoxSerializer(giftboxes, many=True).data
         return Response(categorized_giftboxes)
-    
+
     def post(self, request):
         search_query = request.data.get('search_query')
         search_item = GiftBox.objects.filter(Q(name__icontains=search_query))[:5]
         searchItems = GiftBoxSerializer(search_item, many=True).data
-        
+
         return Response(searchItems)
 
 class GiftBoxDetailView(APIView):
@@ -49,9 +49,24 @@ class GiftBoxDetailView(APIView):
 class AddToCartView(APIView):
     def post(self, request):
         response = Response("Added to cart succesfully")
-        if 'anonymous_user_id' not in request.COOKIES:
-            user_id = uuid.uuid4()
-            response.set_cookie('anonymous_user_id', user_id, max_age=31536000)
+        #if not a customer use cookies to create an id
+        shopper_id = request.COOKIES.get('les_user_id')
+        if not shopper_id:
+            shopper_id = str(uuid.uuid4())
+            response.set_cookie(
+                'les_user_id',
+                value=shopper_id,
+                max_age=31536000,
+                httponly=True,
+                secure = True,
+                samesite='None'
+            )
+
+        """
+        if 'les_user_id' not in request.COOKIES:
+            user_id = str(uuid.uuid4())
+            response.set_cookie('les_user_id', user_id, max_age=31536000)
+        """
 
         product_id = request.data.get('product_id')
         product_name = request.data.get('product_name')
@@ -66,8 +81,6 @@ class AddToCartView(APIView):
         if request.user.is_authenticated:
             customer = Customer.objects.get(email=request.user.email)
         else:
-            #if not a customer use cookies to create an id
-            shopper_id = request.COOKIES.get('anonymous_user_id')
 
             # Check if the non-customer shopper has shopped before
             existing_order = Order.objects.filter(session_id=shopper_id, cart_status='cart').first()
@@ -95,13 +108,13 @@ class AddToCartView(APIView):
                 order_item = OrderItem.objects.create(order=order, gift_box=gift_box, quantity=quantity, price=gift_box.price, description=des_text, image=image_data)
             else:
                 order_item = OrderItem.objects.create(order=order, gift_box=gift_box, quantity=quantity, price=gift_box.price, description=des_text)
-        
+
         order.save()
         return response
 
 class CartItemsAPI(APIView):
     def get(self, request):
-        shopper_id = request.COOKIES.get('anonymous_user_id')
+        shopper_id = request.COOKIES.get('les_user_id')
         if request.user.is_authenticated:
             #order = Order.objects.get(email=request.user.email, cart_status='cart')
             order = Order.objects.filter(session_id=shopper_id, cart_status='cart').first()
@@ -115,7 +128,7 @@ class CartItemsAPI(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        shopper_id = request.COOKIES.get('anonymous_user_id')
+        shopper_id = request.COOKIES.get('les_user_id')
         order = Order.objects.get(session_id=shopper_id, cart_status='cart')
         order_id = request.data.get('order_id')
         cart_action = request.data.get('cart_action')
@@ -135,7 +148,7 @@ class CartItemsAPI(APIView):
 class CheckoutAPI(APIView):
     def get(self, request):
         # Get the order instance
-        shopper_id = request.COOKIES.get('anonymous_user_id')
+        shopper_id = request.COOKIES.get('les_user_id')
         if request.user.is_authenticated:
             #order = Order.objects.get(email=request.user.email, cart_status='cart')
             order = Order.objects.filter(session_id=shopper_id, cart_status='cart').first()
@@ -150,15 +163,15 @@ class CheckoutAPI(APIView):
                 #print(customer)
                 serializer = CustomerSerializer(customer)
                 response = Response(serializer.data)
-            
+
             else:
                 existing_customer = Customer.objects.filter(session_id=shopper_id).first()
-        
+
                 if existing_customer:
                     customer = existing_customer
                     order.customer = customer
                     order.save()
-                        
+
                     #print(customer)
                     serializer = CustomerSerializer(customer)
                     response = Response(serializer.data)
@@ -179,7 +192,7 @@ class CheckoutAPI(APIView):
     def post(self, request):
         # Get the order instance
 
-        shopper_id = request.COOKIES.get('anonymous_user_id')
+        shopper_id = request.COOKIES.get('les_user_id')
         if request.user.is_authenticated:
             #order = Order.objects.get(email=request.user.email, cart_status='cart')
             order = Order.objects.filter(session_id=shopper_id, cart_status='cart').first()
@@ -203,7 +216,7 @@ class CheckoutAPI(APIView):
                     session_id=shopper_id
                 )
                 customer.save()
-                    
+
                 order.customer = customer
                 order.save()
             response = Response("done")
@@ -216,7 +229,7 @@ class PaymentSuccess(APIView):
         action = request.data.get('actionn')
         receive_option = request.data.get('selected')
         if action == 'proceed':
-            shopper_id = request.COOKIES.get('anonymous_user_id')
+            shopper_id = request.COOKIES.get('les_user_id')
             if request.user.is_authenticated:
                 #order = Order.objects.get(email=request.user.email, cart_status='cart')
                 order = Order.objects.get(session_id=shopper_id, cart_status='cart')
@@ -235,20 +248,20 @@ class PaymentSuccess(APIView):
 
 class OrderView(APIView):
     def get(self, request):
-        shopper_id = request.COOKIES.get('anonymous_user_id')
+        shopper_id = request.COOKIES.get('les_user_id')
         if request.user.is_authenticated:
             #order = Order.objects.get(email=request.user.email, cart_status='cart')
             order = Order.objects.filter(session_id=shopper_id, cart_status='real')
         else:
             #session = request.session
             order = Order.objects.filter(session_id=shopper_id, cart_status='real')
-    
+
         ordered = {}
         for orders in order:
             order_items = OrderItem.objects.filter(order=orders)
             ordered[orders.order_date.strftime('%Y-%m-%d %H:%M:%S')] = OrderItemSerializer(order_items, many=True).data
         return Response(ordered)
-        
+
 """
 
 def customer_account(request):
@@ -290,7 +303,7 @@ def create_order(request):
     # ...
 
     def post(self, request):
-    
+
         product_id = request.data.get('product_id')
         product_name = request.data.get('product_name')
         product_price = request.data.get('product_price')
