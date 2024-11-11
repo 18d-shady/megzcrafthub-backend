@@ -114,7 +114,21 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",  # React app URL
+    "https://megzcrafthub.ng",
+    "https://loquacious-torte-d59bfb.netlify.app",
+    "https://megzcrafthub-frontend.vercel.app",
+]
+
+#CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True  # Allow cookies to be sent
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # React app URL
+    "https://megzcrafthub.ng",
+    "https://loquacious-torte-d59bfb.netlify.app",
+    "https://megzcrafthub-frontend.vercel.app",
+]
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
